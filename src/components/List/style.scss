@@ -1,0 +1,45 @@
+.List {
+    position: relative;
+
+    .col-l {
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 0 20px;
+    }
+
+    .list-controls {
+        text-align: right;
+    }
+
+    .list-group-item {
+        cursor: pointer;
+        background-color: inherit;
+        box-shadow: none;
+        transition: box-shadow ease-in 0.2s;
+        height: 118px;
+        overflow: hidden;
+
+        &.active, &:hover {
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.14), 0 4px 8px rgba(0, 0, 0, 0.28);
+            border-color: transparent;
+            color: inherit;
+        }
+    }
+
+    ul.list-group {
+        > li:first-child {
+            border-top: none;
+        }
+    }
+
+    .item-title {
+        font-weight: bold;
+        font-size: 1.25rem;
+        color: #039be5;
+    }
+
+    .item-date {
+        font-weight: lighter;
+        font-style: italic;
+    }
+}

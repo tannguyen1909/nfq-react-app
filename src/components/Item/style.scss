@@ -1,0 +1,37 @@
+@import "../../sass/core/index";
+
+.Item {
+    //position: absolute;
+    right: 0;
+    top: 0;
+    width: 0px;
+    min-height: calc(100vh - #{$header-height});
+    background-color: white;
+    z-index: 100;
+    //transform: translateX(100%);
+    transition: 0.2s all linear;
+
+    &.active {
+        //transform: translateX(0);
+        width: 600px;
+        box-shadow: 0 0 4px rgba(0,0,0,.14), 0 4px 8px rgba(0,0,0,.28);
+    }
+
+    .Item-header {
+        padding: $content-padding;
+        background-color: #E1E1E1;
+    }
+
+    .Item-detail {
+        padding: $content-padding;
+    }
+
+    .form-group >label{
+        font-weight: bold;
+    }
+
+    .item-title {
+        color: #039be5;
+        font-weight: bold;
+    }
+}
