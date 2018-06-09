@@ -40,8 +40,8 @@ export class List extends Component {
         })
     }
 
-    onChange(isClosed) {
-        this.fetch();
+    onChange(isClosed, noRefresh) {
+        !noRefresh && this.fetch();
         isClosed && this.setState({currentId: null});
     }
 
@@ -77,7 +77,7 @@ export class List extends Component {
                                 }    
                             </ul>
                         </div>
-                        <div className="col-r">
+                        <div className="col-r d-flex">
                             <Item currentId={this.state.currentId}
                                   ref={instance => this.myRef = instance}
                                   onChange={this.onChange.bind(this)}/>

@@ -98,6 +98,7 @@ export class Item extends Component {
                 .then(() => {
                     this.props.onChange(true);
                     this.setState({closed: true});
+                    this.props.onChange(true);
                 })
                 .catch(() => {
                     alert("Can not delete this item. Please try again later!")
@@ -107,6 +108,7 @@ export class Item extends Component {
 
     close() {
         this.setState({closed: true, mode: 'view'});
+        this.props.onChange(true, true);
     }
 
     cancel() {
