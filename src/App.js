@@ -1,18 +1,34 @@
 import React, {Component} from 'react';
 import './App.scss';
+import {connect} from 'react-redux';
 import {Header, List} from './components';
+import {fetchPosts} from './actions';
 
 class App extends Component {
+
+    componentWillMount() {
+        const {dispatch} = this.props;
+        dispatch(fetchPosts);
+    }
+
     render() {
         return (
             <div className="App">
                 <Header/>
                 <main>
-                    <List/>
+                    <List {...this.props} />
                 </main>
             </div>
         );
     }
 }
 
-export default App;
+const mapStateToProps = ({posts}) => {
+    return {
+        isFetching: posts.isFetching,
+        posts: posts.posts || [],
+        currentId: posts.currentId
+    }
+};
+
+export default connect(mapStateToProps)(App);

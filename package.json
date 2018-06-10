@@ -100,8 +100,10 @@
     "extends": "react-app"
   },
   "devDependencies": {
+    "export-to-csv": "^0.1.1",
     "gh-pages": "^1.2.0",
     "node-sass": "^4.9.0",
+    "redux-thunk": "^2.3.0",
     "sass-loader": "^7.0.2"
   }
 }

@@ -1,7 +1,9 @@
-export function convertArrayToCSV(data) {  
+import { ExportToCsv } from 'export-to-csv';
+
+export function convertArrayToCSV(data) {
     let result = '', 
         ctr, keys, 
-        columnDelimiter = ';', 
+        columnDelimiter = ',',
         lineDelimiter = '\n';
 
     if (data == null || !data.length) {
@@ -68,5 +70,14 @@ export class CSV {
         });
     
         return result;
+    }
+
+    static export(data, filename) {
+        return new ExportToCsv({
+            title: filename,
+            filename: filename,
+            showTitle: true,
+            useKeysAsHeaders: true
+        }).generateCsv(data);
     }
 }

@@ -2,6 +2,24 @@ import React, {Component} from 'react';
 import './style.scss';
 import {$storage} from '../../services';
 
+const Audio = (props) => {
+    return (
+        <audio className="media-player" src={props.url} controls />
+    );
+};
+
+const Image = (props) => {
+    return (
+        <img className="img-fluid" src={props.url} alt={props.name} />
+    );
+};
+
+const Video = (props) => {
+    return (
+        <video className="media-player" src={props.url} controls />
+    );
+};
+
 const MAP_TYPE = {
     "image" : Image,
     "audio" : Audio,
@@ -64,22 +82,4 @@ export class Media extends Component {
             </div>
         );
     }
-}
-
-function Audio(props) {
-    return (
-        <audio className="media-player" src={props.url} controls />
-    );
-}
-
-function Image(props) {
-    return (
-        <img className="img-fluid" src={props.url} alt={props.name} />
-    );
-}
-
-function Video(props) {
-    return (
-        <video className="media-player" src={props.url} controls />
-    );
 }
