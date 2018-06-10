@@ -34,4 +34,9 @@
         color: #039be5;
         font-weight: bold;
     }
+
+    .custom-file-label {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 }

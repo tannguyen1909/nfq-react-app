@@ -184,7 +184,7 @@ export class Item extends Component {
                                     disabled={!this.state.data.title}
                                     onClick={this.save.bind(this)}>Save</button>
                     }
-                    <button className="btn btn-secondary" onClick={this.cancel.bind(this)}>Cancel</button>
+                    <button className="btn btn-secondary" onClick={this.state.mode === 'create' ? this.close.bind(this) : this.cancel.bind(this)}>Cancel</button>
                 </div>
                 <div className="Item-detail">
                     <div className="form-group">
