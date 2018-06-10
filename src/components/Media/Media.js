@@ -19,10 +19,14 @@ export class Media extends Component {
     }
 
     componentWillReceiveProps(props) {
-        props.name && this.getDownloadUrl(props.name);
-        props.url && this.setState({
-            url: props.url,
-            type: props.type
+        if (props.name) {
+            this.getDownloadUrl(props.name);
+            return;
+        }
+
+        this.setState({
+            url: props.url || '',
+            type: props.type || ''
         });
     }
 
