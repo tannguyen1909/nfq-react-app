@@ -38,10 +38,20 @@
         font-weight: bold;
         font-size: 1.25rem;
         color: #039be5;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .item-date {
         font-weight: lighter;
         font-style: italic;
+        min-width: 130px;
+        text-align: right;
+    }
+
+    .item-des {
+        overflow: hidden;
+        height: 53px;
     }
 }

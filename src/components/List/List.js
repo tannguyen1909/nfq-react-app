@@ -71,7 +71,7 @@ export class List extends Component {
                                                 <div className="item-title mr-auto">{file.title}</div>
                                                 <small className="item-date pl-3">{new Date(file.dateCreated).toDateString()}</small>
                                             </div>
-                                            <p>{file.description}</p>
+                                            <p className="item-des">{file.description}</p>
                                         </li>
                                     )
                                 }    

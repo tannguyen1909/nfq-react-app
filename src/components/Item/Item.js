@@ -167,7 +167,7 @@ export class Item extends Component {
                 </div>
                 <div className="Item-detail">
                     <h4 className="item-title">{this.state.data.title}</h4>
-                    <p>{this.state.data.description}</p>
+                    <p className="item-des">{this.state.data.description}</p>
                     <Media name={this.state.data.media}/>
                 </div>
             </div>
