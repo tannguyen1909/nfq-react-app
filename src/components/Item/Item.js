@@ -49,7 +49,7 @@ export class Item extends Component {
     }
 
     add() {
-        this.state.mode !== 'create' && this.setState({
+        this.setState({
             data: {
                 title: "",
                 description: "",
@@ -111,7 +111,7 @@ export class Item extends Component {
     }
 
     close() {
-        this.setState({closed: true, mode: 'view'});
+        this.setState({closed: true});
         this.props.onChange(true, true);
     }
 

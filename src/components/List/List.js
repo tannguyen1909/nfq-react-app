@@ -3,7 +3,7 @@ import './style.scss';
 import {Loading} from '../Loading/Loading';
 import {Item} from '../Item/Item';
 import {CSV} from '../../utils';
-import {selectPost} from "../../actions";
+import {fetchPosts, selectPost} from "../../actions";
 
 export class List extends Component {
 
@@ -22,7 +22,7 @@ export class List extends Component {
     }
 
     onChange(isClosed, noRefresh) {
-        !noRefresh && this.fetch();
+        !noRefresh && this.props.dispatch(fetchPosts);
         isClosed && this.props.dispatch(selectPost(null));
     }
 
