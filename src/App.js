@@ -6,7 +6,7 @@ import {fetchPosts} from './actions';
 
 class App extends Component {
 
-    componentWillMount() {
+    componentDidMount() {
         const {dispatch} = this.props;
         dispatch(fetchPosts);
     }
