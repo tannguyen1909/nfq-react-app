@@ -68,25 +68,28 @@ export class Item extends Component {
 
     save() {
         const oldFileName = this.state.data.media;
+        const savePost = () => {
+            $db.doc(this.state.data.id).set(this.state.data)
+                .then(docRef => {
+                    docRef ? this.setState({
+                        mode: 'view',
+                        data: {...{id: docRef.id}, ...this.state.data}
+                    }) : this.fetch(this.props.currentId).then(() => this.cancel());
+                    this.props.onChange();
+                })
+                .catch(() => {
+                    alert("Can not update this item. Please try again!");
+                });
+        };
+
         this.uploadFile()
             .then(() => {
                 if (oldFileName !== this.state.data.media) {
                     $storage.ref(oldFileName).delete();
                 }
+                savePost();
             })
-            .finally(() => {
-                $db.doc(this.state.data.id).set(this.state.data)
-                    .then(docRef => {
-                        docRef ? this.setState({
-                            mode: 'view',
-                            data: {...{id: docRef.id}, ...this.state.data}
-                        }) : this.fetch(this.props.currentId).then(() => this.cancel());
-                        this.props.onChange();
-                    })
-                    .catch(() => {
-                        alert("Can not update this item. Please try again!");
-                    });
-            });
+            .catch(() => savePost());
     }
 
     delete() {
