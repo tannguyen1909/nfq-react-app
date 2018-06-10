@@ -40,6 +40,7 @@ export class Item extends Component {
     }
 
     create() {
+        this.props.dispatch(requestPosts());
         this.uploadFile()
             .then(() => {
                 $db.add(this.state.data)
@@ -49,9 +50,11 @@ export class Item extends Component {
                             data: {...{id: docRef.id}, ...this.state.data}
                         });
                         this.props.onChange();
-                    })
+                    });
+                this.props.dispatch(requestFinished());
             })
             .catch((err) => {
+                this.props.dispatch(requestFinished());
                 alert("Can not create this item. Please try again!");
             });
     }
@@ -84,12 +87,15 @@ export class Item extends Component {
                         data: {...{id: docRef.id}, ...this.state.data}
                     }) : this.fetch(this.props.currentId).then(() => this.cancel());
                     this.props.onChange();
+                    this.props.dispatch(requestFinished());
                 })
                 .catch(() => {
                     alert("Can not update this item. Please try again!");
+                    this.props.dispatch(requestFinished());
                 });
         };
 
+        this.props.dispatch(requestPosts());
         this.uploadFile()
             .then(() => {
                 if (oldFileName !== this.state.data.media) {
@@ -105,15 +111,17 @@ export class Item extends Component {
 
         if (result) {
             this.state.data.media && $storage.ref(this.state.data.media).delete();
-
+            this.props.dispatch(requestPosts());
             $db.doc(this.state.data.id).delete()
                 .then(() => {
                     this.props.onChange(true);
                     this.setState({closed: true});
                     this.props.onChange(true);
+                    this.props.dispatch(requestFinished());
                 })
                 .catch(() => {
-                    alert("Can not delete this item. Please try again later!")
+                    alert("Can not delete this item. Please try again later!");
+                    this.props.dispatch(requestFinished());
                 });
         }
     }
