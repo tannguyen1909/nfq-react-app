@@ -51,16 +51,15 @@ export class Media extends Component {
     getDownloadUrl(name) {
         if (name) {
             const fileRef = $storage.ref(name);
-
             Promise.all([fileRef.getDownloadURL(), fileRef.getMetadata()])
                 .then(res => {
                     this.setState({
                         url: res[0],
                         type: res[1].contentType.split('/')[0]
-                    })
+                    });
                 })
                 .catch(() => {
-                    this.setState({url: '', type: ''})
+                    this.setState({url: '', type: ''});
                 });
         }
     }

@@ -11,6 +11,7 @@
     //transform: translateX(100%);
     transition: 0.2s all linear;
     overflow-x: hidden;
+    position: relative;
 
     &.active {
         //transform: translateX(0);

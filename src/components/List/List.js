@@ -58,7 +58,7 @@ export class List extends Component {
                     </ul>
                 </div>
                 <div className="col-r d-flex">
-                    <Item currentId={this.props.currentId}
+                    <Item {...this.props}
                           ref={instance => this.myRef = instance}
                           onChange={this.onChange.bind(this)}/>
                 </div>

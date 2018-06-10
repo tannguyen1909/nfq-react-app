@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import './style.scss';
 import {$db, $storage} from '../../services';
 import {Media} from '../Media/Media';
+import {requestPosts, requestFinished} from "../../actions";
 
 export class Item extends Component {
 
@@ -24,11 +25,18 @@ export class Item extends Component {
     }
 
     fetch(id) {
+        this.props.dispatch(requestPosts());
         return $db.doc(id).get()
-            .then(item => this.setState({
-                data: {...item.data(), ...{id: id}}
-            }))
-            .catch(() => alert("Can not get this item. Please try again later!"));
+            .then(item => {
+                this.setState({
+                    data: {...item.data(), ...{id: id}}
+                });
+                this.props.dispatch(requestFinished());
+            })
+            .catch(() => {
+                this.props.dispatch(requestFinished());
+                alert("Can not get this item. Please try again later!");
+            });
     }
 
     create() {
@@ -168,7 +176,7 @@ export class Item extends Component {
                 <div className="Item-detail">
                     <h4 className="item-title">{this.state.data.title}</h4>
                     <p className="item-des">{this.state.data.description}</p>
-                    <Media name={this.state.data.media}/>
+                    <Media name={this.state.data.media} {...this.props}/>
                 </div>
             </div>
         );
@@ -218,8 +226,8 @@ export class Item extends Component {
                     </div>
                     <div className="form-group">
                         {this.state.file.type
-                            ? <Media url={this.state.file.url} type={this.state.file.type.split('/')[0]} />
-                            : this.state.data.media && <Media name={this.state.data.media} />}
+                            ? <Media url={this.state.file.url} type={this.state.file.type.split('/')[0]} {...this.props}/>
+                            : this.state.data.media && <Media name={this.state.data.media}  {...this.props} />}
                     </div>
                 </div>
             </div>

@@ -1,10 +1,11 @@
 .Loading {
 
-	position: absolute;
+	position: fixed;
 	background-color: rgba(255, 255, 255, .6);
 	top: 0;
 	width: 100%;
 	bottom: 0;
+	z-index: 1000;
 
 	.cssload-loader {
 		position: absolute;

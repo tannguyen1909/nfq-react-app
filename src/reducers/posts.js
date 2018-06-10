@@ -1,4 +1,4 @@
-import {REQUEST_POSTS, RECEIVE_POSTS, SELECT_POST} from '../actions'
+import {REQUEST_POSTS, RECEIVE_POSTS, SELECT_POST, REQUEST_FINISH} from '../actions'
 
 
 const posts = (state = {}, action) => {
@@ -7,6 +7,11 @@ const posts = (state = {}, action) => {
             return {
                 ...state,
                 isFetching: true
+            };
+        case REQUEST_FINISH:
+            return {
+                ...state,
+                isFetching: false
             };
         case RECEIVE_POSTS:
             return {

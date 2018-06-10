@@ -1,10 +1,11 @@
 import {$db} from '../services';
 
 
-export const REQUEST_POSTS  = 'REQUEST_POSTS';
-export const RECEIVE_POSTS  = 'RECEIVE_POSTS';
-export const SELECT_POST    = 'SELECT_POST';
-export const GET_POST       = 'GET_POST';
+export const REQUEST_POSTS      = 'REQUEST_POSTS';
+export const RECEIVE_POSTS      = 'RECEIVE_POSTS';
+export const SELECT_POST        = 'SELECT_POST';
+export const GET_POST           = 'GET_POST';
+export const REQUEST_FINISH     = 'REQUEST_FINISH';
 
 export const requestPosts = () => ({
     type: REQUEST_POSTS
@@ -18,6 +19,10 @@ export const receivePosts = (data) => ({
 export const selectPost = (id) => ({
     type: SELECT_POST,
     currentId: id
+});
+
+export const requestFinished = () => ({
+    type: REQUEST_FINISH
 });
 
 export const fetchPosts = (dispatch) => {
