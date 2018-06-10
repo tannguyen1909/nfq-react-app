@@ -57,6 +57,7 @@ export class Item extends Component {
                 media: ""
             },
             mode: 'create',
+            file: {},
             closed: false
         });
     }

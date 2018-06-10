@@ -30,7 +30,7 @@ export function convertArrayToCSV(data) {
 export class CSV {
 
     static getCSV(data) {
-        let csv = convertArrayToCSV(this.state.data);
+        let csv = convertArrayToCSV(data);
         
         if (csv == null) return;
 
