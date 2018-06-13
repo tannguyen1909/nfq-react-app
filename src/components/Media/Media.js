@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import './style.scss';
-import {$storage} from '../../services';
 
 const Audio = (props) => {
     return (
@@ -28,55 +27,21 @@ const MAP_TYPE = {
 
 export class Media extends Component {
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            url: '',
-            type: ''
-        };
-    }
-
-    componentWillReceiveProps(props) {
-        if (props.name) {
-            this.getDownloadUrl(props.name);
-            return;
-        }
-
-        this.setState({
-            url: props.url || '',
-            type: props.type || ''
-        });
-    }
-
-    getDownloadUrl(name) {
-        if (name) {
-            const fileRef = $storage.ref(name);
-            Promise.all([fileRef.getDownloadURL(), fileRef.getMetadata()])
-                .then(res => {
-                    this.setState({
-                        url: res[0],
-                        type: res[1].contentType.split('/')[0]
-                    });
-                })
-                .catch(() => {
-                    this.setState({url: '', type: ''});
-                });
-        }
-    }
-
     getMediaControl() {
-        const Control = MAP_TYPE[this.state.type];
-        return <Control url={this.state.url} name={this.state.name}/>
+        const Control = MAP_TYPE[this.props.type.split('/')[0]] || MAP_TYPE['image'];
+        return <Control url={this.props.url} name={this.props.name}/>
     }
 
     render() {
+        const {url, type} = this.props;
+
         return (
             <div className="Media">
                 <div className="preview">
-                    {this.state.type && this.state.url && this.getMediaControl()}
+                    {type && url && this.getMediaControl()}
                 </div>
                 <div className="actions mt-3">
-                    {this.state.url && <a href={this.state.url} download className="btn btn-primary" target="_blank">Download</a>}
+                    {url && <a href={url} download className="btn btn-primary" target="_blank">Download</a>}
                 </div>
             </div>
         );

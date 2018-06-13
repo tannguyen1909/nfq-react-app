@@ -15,7 +15,7 @@ const $firestore    = $firebase.firestore();
 
 $firestore.settings({timestampsInSnapshots: true});
 
-const $db           = $firestore.collection('files');
+const $db           = $firestore.collection('posts');
 const $storage      = $firebase.storage();
 
 export {

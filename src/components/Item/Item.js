@@ -1,8 +1,7 @@
 import React, {Component} from 'react';
 import './style.scss';
-import {$db, $storage} from '../../services';
 import {Media} from '../Media/Media';
-import {requestPosts, requestFinished} from "../../actions";
+import {updateState, createPost, deletePost, resetDetail, savePost} from "../../actions";
 
 export class Item extends Component {
 
@@ -10,129 +9,59 @@ export class Item extends Component {
         super(props);
         this.state = {
             data: {},
-            file: {},
-            mode: 'view',
-            closed: true
+            file: {}
         }
-    }
-
-    componentWillReceiveProps(props) {
-        if (props.currentId && props.currentId !== this.props.currentId) {
-            this.setState({closed: false, mode: 'view', file: {}, data: {}}, () => {
-                this.fetch(props.currentId)
-            });
-        }
-    }
-
-    fetch(id) {
-        this.props.dispatch(requestPosts());
-        return $db.doc(id).get()
-            .then(item => {
-                this.setState({
-                    data: {...item.data(), ...{id: id}}
-                });
-                this.props.dispatch(requestFinished());
-            })
-            .catch(() => {
-                this.props.dispatch(requestFinished());
-                alert("Can not get this item. Please try again later!");
-            });
     }
 
     create() {
-        this.props.dispatch(requestPosts());
-        this.uploadFile()
-            .then(() => {
-                $db.add(this.state.data)
-                    .then(docRef => {
-                        docRef && this.setState({
-                            mode: 'view',
-                            data: {...{id: docRef.id}, ...this.state.data}
-                        });
-                        this.props.onChange();
-                    });
-                this.props.dispatch(requestFinished());
-            })
-            .catch((err) => {
-                this.props.dispatch(requestFinished());
-                alert("Can not create this item. Please try again!");
-            });
+        this.props.dispatch(createPost(this.state.data, this.state.file))
     }
 
     add() {
         this.setState({
             data: {
                 title: "",
-                description: "",
-                dateCreated: Date.now(),
-                media: ""
+                description: ""
             },
-            mode: 'create',
-            file: {},
-            closed: false
+            file: {}
         });
     }
 
     edit() {
-        this.setState({mode: 'edit'});
+        const {currentPost} = this.props;
+
+        this.props.dispatch(updateState({mode: 'edit'}));
+
+        this.setState({
+            data: JSON.parse(JSON.stringify(currentPost)),
+            file: {
+                type: currentPost.mediaType,
+                url: currentPost.link
+            }
+        });
     }
 
     save() {
-        const oldFileName = this.state.data.media;
-        const savePost = () => {
-            $db.doc(this.state.data.id).set(this.state.data)
-                .then(docRef => {
-                    docRef ? this.setState({
-                        mode: 'view',
-                        data: {...{id: docRef.id}, ...this.state.data}
-                    }) : this.fetch(this.props.currentId).then(() => this.cancel());
-                    this.props.onChange();
-                    this.props.dispatch(requestFinished());
-                })
-                .catch(() => {
-                    alert("Can not update this item. Please try again!");
-                    this.props.dispatch(requestFinished());
-                });
-        };
-
-        this.props.dispatch(requestPosts());
-        this.uploadFile()
-            .then(() => {
-                if (oldFileName !== this.state.data.media) {
-                    $storage.ref(oldFileName).delete();
-                }
-                savePost();
-            })
-            .catch(() => savePost());
+        this.props.dispatch(savePost(this.state.data, this.state.file));
     }
 
     delete() {
         const result = window.confirm('Are you sure you want to delete?');
 
         if (result) {
-            this.state.data.media && $storage.ref(this.state.data.media).delete();
-            this.props.dispatch(requestPosts());
-            $db.doc(this.state.data.id).delete()
-                .then(() => {
-                    this.props.onChange(true);
-                    this.setState({closed: true});
-                    this.props.onChange(true);
-                    this.props.dispatch(requestFinished());
-                })
-                .catch(() => {
-                    alert("Can not delete this item. Please try again later!");
-                    this.props.dispatch(requestFinished());
-                });
+            const {currentPost} = this.props;
+            this.props.dispatch(deletePost(currentPost.id, currentPost.fileName));
         }
     }
 
     close() {
-        this.setState({closed: true});
-        this.props.onChange(true, true);
+        this.props.dispatch(resetDetail());
     }
 
     cancel() {
-        this.setState({mode: 'view'});
+        this.props.dispatch(updateState({
+            mode: 'view'
+        }))
     }
 
     handleChange(field, event) {
@@ -154,26 +83,9 @@ export class Item extends Component {
         }
     }
 
-    uploadFile() {
-        return new Promise((resolve, reject) => {
-            const file = this.state.file;
-            const date = Date.now();
-
-            if (file.name) {
-                $storage.ref(`${date}-${file.name}`).put(file)
-                    .then(snapshot => {
-                        this.setState({
-                            data: Object.assign(this.state.data, {media: snapshot.ref.fullPath})
-                        }, resolve);
-                    })
-                    .catch(reject)
-            } else {
-                reject();
-            }
-        });
-    }
-
     getViewTemplate() {
+        const {currentPost: data} = this.props;
+
         return (
             <div className="Item-content">
                 <div className="Item-header d-flex align-items-center">
@@ -182,9 +94,9 @@ export class Item extends Component {
                     <button className="btn btn-danger" onClick={this.delete.bind(this)}>Delete</button>
                 </div>
                 <div className="Item-detail">
-                    <h4 className="item-title">{this.state.data.title}</h4>
-                    <p className="item-des">{this.state.data.description}</p>
-                    <Media name={this.state.data.media} {...this.props}/>
+                    <h4 className="item-title">{data.title}</h4>
+                    <p>{data.description}</p>
+                    <Media url={data.link} type={data.mediaType} />
                 </div>
             </div>
         );
@@ -195,7 +107,7 @@ export class Item extends Component {
             <div className="Item-content">
                 <div className="Item-header d-flex align-items-center justify-content-end">
                     {
-                        this.state.mode === 'create'
+                        this.props.mode === 'create'
                             ? <button className="btn btn-primary mr-3"
                                     disabled={!this.state.data.title || !this.state.file.name}
                                     onClick={this.create.bind(this)}>Create</button>
@@ -203,7 +115,7 @@ export class Item extends Component {
                                     disabled={!this.state.data.title}
                                     onClick={this.save.bind(this)}>Save</button>
                     }
-                    <button className="btn btn-secondary" onClick={this.state.mode === 'create' ? this.close.bind(this) : this.cancel.bind(this)}>Cancel</button>
+                    <button className="btn btn-secondary" onClick={this.props.mode === 'create' ? this.close.bind(this) : this.cancel.bind(this)}>Cancel</button>
                 </div>
                 <div className="Item-detail">
                     <div className="form-group">
@@ -233,9 +145,7 @@ export class Item extends Component {
                         </div>
                     </div>
                     <div className="form-group">
-                        {this.state.file.type
-                            ? <Media url={this.state.file.url} type={this.state.file.type.split('/')[0]} {...this.props}/>
-                            : this.state.data.media && <Media name={this.state.data.media}  {...this.props} />}
+                        {this.props.mode !== 'create' && <Media url={this.state.file.url} type={this.state.file.type} />}
                     </div>
                 </div>
             </div>
@@ -244,8 +154,8 @@ export class Item extends Component {
 
     render() {
         return (
-            <div className={`Item ${!this.state.closed ? 'active' : ''}`}>
-                {this.state.mode === 'view' ? this.getViewTemplate() : this.getEditTemplate()}
+            <div className={`Item ${this.props.opening ? 'active' : ''}`}>
+                {this.props.mode === 'view' ? this.getViewTemplate() : this.getEditTemplate()}
             </div>
         );
     }

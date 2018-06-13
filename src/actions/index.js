@@ -1,28 +1,38 @@
-import {$db} from '../services';
+import {$db, $storage} from '../services';
 
 
 export const REQUEST_POSTS      = 'REQUEST_POSTS';
 export const RECEIVE_POSTS      = 'RECEIVE_POSTS';
 export const SELECT_POST        = 'SELECT_POST';
-export const GET_POST           = 'GET_POST';
 export const REQUEST_FINISH     = 'REQUEST_FINISH';
+export const UPDATE_STATE       = 'UPDATE_STATE';
+export const RESET_DETAIL       = 'RESET_DETAIL';
 
 export const requestPosts = () => ({
     type: REQUEST_POSTS
 });
 
-export const receivePosts = (data) => ({
+export const receivePosts = (posts) => ({
     type: RECEIVE_POSTS,
-    posts: data
+    data: posts
 });
 
-export const selectPost = (id) => ({
+export const selectPost = (post) => ({
     type: SELECT_POST,
-    currentId: id
+    currentPost: post
 });
 
 export const requestFinished = () => ({
     type: REQUEST_FINISH
+});
+
+export const updateState = (state) => ({
+    type: UPDATE_STATE,
+    state: state
+});
+
+export const resetDetail = () => ({
+    type: RESET_DETAIL
 });
 
 export const fetchPosts = (dispatch) => {
@@ -35,4 +45,127 @@ export const fetchPosts = (dispatch) => {
         });
         return dispatch(receivePosts(data));
     });
+};
+
+export const searchPostsFromNasa = (text) => (dispatch) => {
+    let data = [], promises = [];
+    dispatch(requestPosts());
+
+    return fetch(`https://images-api.nasa.gov/search?q=${text}`)
+        .then(response => response.json())
+        .then(({collection: {items}}) => {
+            if (items) {
+                items.forEach(({data: [post], href}, index) => {
+                    data.push({
+                        id: post.nasa_id,
+                        title: post.title,
+                        description: post.description,
+                        mediaType: post.media_type,
+                        dateCreated: new Date(post.date_created).getTime()
+                    });
+                    promises.push(
+                        fetch(href).then(res => res.json())
+                            .then(links => data[index].link = links[0])
+                    );
+                });
+            }
+
+            return Promise.all(promises)
+                .then(() => dispatch(receivePosts(data)))
+                .catch(() => dispatch(receivePosts(data)));
+        });
+};
+
+const uploadFile = (file) => {
+    return new Promise((resolve, reject) => {
+        const date = Date.now();
+
+        if (file.name) {
+            $storage.ref(`${date}-${file.name}`).put(file)
+                .then(snapshot => {
+                    snapshot.ref.getDownloadURL()
+                        .then(url => {
+                            resolve({
+                                link: url,
+                                mediaType: file.type,
+                                dateCreated: Date.now(),
+                                fileName: snapshot.ref.name
+                            });
+                        })
+                })
+                .catch(reject)
+        } else {
+            reject();
+        }
+    });
+};
+
+export const createPost = (data, file) => (dispatch) => {
+    dispatch(requestPosts());
+
+    return uploadFile(file)
+        .then((media) => {
+            let post = {...data, ...media};
+            return $db.add(post).then(docRef => {
+                docRef && dispatch(updateState({
+                    mode: 'view',
+                    currentPost: {
+                        ...post,
+                        ...{id: docRef.id},
+                    }
+                }));
+                dispatch(fetchPosts);
+            });
+
+        })
+        .catch(() => {
+            alert("Can not create this item. Please try again!");
+            return dispatch(requestFinished());
+        });
+};
+
+export const savePost = (data, file) => (dispatch) => {
+    dispatch(requestPosts());
+
+    const save = (media) => {
+        let post = {...data, ...(media || {})};
+        return $db.doc(data.id).set(post)
+                .then(() => {
+                    dispatch(updateState({
+                        mode: 'view',
+                        currentPost: post
+                    }));
+                    dispatch(fetchPosts);
+                })
+                .catch(() => {
+                    alert("Can not update this item. Please try again!");
+                    this.props.dispatch(requestFinished());
+                });
+    };
+
+    if (file.name) {
+        $storage.ref(data.fileName).delete();
+
+        return uploadFile(file)
+            .then(save)
+            .catch(save)
+    } else {
+        return save();
+    }
+};
+
+export const deletePost = (id, fileName) => (dispatch) => {
+    dispatch(requestPosts());
+
+    fileName && $storage.ref(fileName).delete();
+
+    return $db.doc(id).delete()
+        .then(() => {
+            dispatch(fetchPosts);
+            dispatch(resetDetail());
+        })
+        .catch(() => {
+            alert("Can not delete this item. Please try again later!");
+            dispatch(requestFinished());
+        });
 };

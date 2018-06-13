@@ -3,7 +3,7 @@ import './style.scss';
 import {Loading} from '../Loading/Loading';
 import {Item} from '../Item/Item';
 import {CSV} from '../../utils';
-import {fetchPosts, selectPost} from "../../actions";
+import {fetchPosts, searchPostsFromNasa, selectPost, updateState} from "../../actions";
 
 export class List extends Component {
 
@@ -18,40 +18,61 @@ export class List extends Component {
 
     create() {
         this.myRef.add();
-        this.props.dispatch(selectPost(null))
+        this.props.dispatch(updateState({
+            opening: true,
+            mode: 'create',
+            currentPost: {},
+            currentId: null
+        }));
     }
 
-    onChange(isClosed, noRefresh) {
-        !noRefresh && this.props.dispatch(fetchPosts);
-        isClosed && this.props.dispatch(selectPost(null));
+    onChange() {
+        // this.props.dispatch(fetchPosts);
     }
 
-    viewDetail(id) {
-        const {dispatch} = this.props;
-        dispatch(selectPost(id));
+    viewDetail(post) {
+        this.props.dispatch(selectPost(post));
+    }
+
+    onSearch(e) {
+        if (e.key === 'Enter' && e.target.value) {
+            this.props.dispatch(searchPostsFromNasa(e.target.value));
+        }
     }
 
     render() {
+        const {data} = this.props;
+
         return (
             <div className="List d-flex">
                 <div className="col-l">
-                    <div className="list-controls mb-5">
+                    <div className="list-controls mb-3">
                         <button className="btn btn-outline-primary mr-3"
                             onClick={this.create.bind(this)}>Create
                         </button>
                         <button className="btn btn-outline-secondary"onClick={this.exportToCSV.bind(this)}>Export CSV</button>
                     </div>
-                    <ul className="list-group list-group-flush">
+                    <div className="mb-5">
+                        <div className="input-group">
+                            <div className="input-group-prepend">
+                                <span className="input-group-text">NASA</span>
+                            </div>
+                            <input type="text"
+                                   onKeyPress={this.onSearch.bind(this)}
+                                   className="form-control" placeholder="Search..."/>
+                        </div>
+                    </div>
+                    <ul className="list-group list-group-flush mb-4">
                         {
-                            this.props.posts.map(file =>
-                                <li className={`list-group-item ${this.props.currentId === file.id ? 'active' : ''}`}
-                                    key={file.id}
-                                    onClick={this.viewDetail.bind(this, file.id)}>
+                            data.map(post =>
+                                <li className={`list-group-item ${this.props.currentId === post.id ? 'active' : ''}`}
+                                    key={post.id}
+                                    onClick={this.viewDetail.bind(this, post)}>
                                     <div className="d-flex align-items-center">
-                                        <div className="item-title mr-auto">{file.title}</div>
-                                        <small className="item-date pl-3">{new Date(file.dateCreated).toDateString()}</small>
+                                        <div className="item-title mr-auto">{post.title}</div>
+                                        <small className="item-date pl-3">{new Date(post.dateCreated).toDateString()}</small>
                                     </div>
-                                    <p className="item-des">{file.description}</p>
+                                    <p className="item-des">{post.description}</p>
                                 </li>
                             )
                         }
@@ -59,8 +80,8 @@ export class List extends Component {
                 </div>
                 <div className="col-r d-flex">
                     <Item {...this.props}
-                          ref={instance => this.myRef = instance}
-                          onChange={this.onChange.bind(this)}/>
+                        ref={instance => this.myRef = instance}
+                        onChange={this.onChange.bind(this)}/>
                 </div>
                 {this.props.isFetching ? <Loading /> : ''}
             </div>

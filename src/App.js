@@ -7,8 +7,7 @@ import {fetchPosts} from './actions';
 class App extends Component {
 
     componentDidMount() {
-        const {dispatch} = this.props;
-        dispatch(fetchPosts);
+        this.props.dispatch(fetchPosts);
     }
 
     render() {
@@ -16,19 +15,15 @@ class App extends Component {
             <div className="App">
                 <Header/>
                 <main>
-                    <List {...this.props} />
+                    <List {...this.props}/>
                 </main>
             </div>
         );
     }
 }
 
-const mapStateToProps = ({posts}) => {
-    return {
-        isFetching: posts.isFetching,
-        posts: posts.posts || [],
-        currentId: posts.currentId
-    }
+const mapStateToProps = ({posts: state}) => {
+    return state;
 };
 
 export default connect(mapStateToProps)(App);
