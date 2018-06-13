@@ -1,7 +1,6 @@
 @import "../../sass/core/index";
 
 .Item {
-    //position: absolute;
     right: 0;
     top: 0;
     width: 0px;
@@ -12,6 +11,7 @@
     transition: 0.2s all linear;
     overflow-x: hidden;
     position: relative;
+    max-width: 100%;
 
     &.active {
         //transform: translateX(0);
@@ -41,5 +41,13 @@
     .custom-file-label {
         overflow: hidden;
         text-overflow: ellipsis;
+    }
+
+    @include media-breakpoint-down(md) {
+        position: absolute;
+
+        &.active {
+            width: 100%;
+        }
     }
 }

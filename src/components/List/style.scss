@@ -15,6 +15,10 @@
         }
     }
 
+    .col-r {
+        max-width: 50%;
+    }
+
     .list-controls {
         display: flex;
     }
@@ -74,9 +78,29 @@
                 color: #007bff;
                 background-color: #fff;
                 border: 1px solid #dee2e6;
+                user-select: none;
 
                 &:not(:disabled):not(.disabled) {
                     cursor: pointer;
+                }
+            }
+
+            &.active {
+                a {
+                    z-index: 1;
+                    color: #fff;
+                    background-color: #007bff;
+                    border-color: #007bff;
+                }
+            }
+
+            &.disabled {
+                a {
+                    color: #6c757d;
+                    pointer-events: none;
+                    cursor: auto;
+                    background-color: #fff;
+                    border-color: #dee2e6;
                 }
             }
         }

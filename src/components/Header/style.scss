@@ -1,22 +1,28 @@
 @import "../../sass/core/index";
 
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 40px;
-}
 
 .App-header {
   background-color: $header-color;
   padding: $content-padding;
   color: white;
-}
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  z-index: 1001;
 
-.App-title {
-  margin: 0;
-}
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+    height: 40px;
+  }
 
-.App-intro {
-  font-size: large;
+  .App-title {
+    margin: 0;
+  }
+
+  .App-intro {
+    font-size: large;
+  }
 }
 
 @keyframes App-logo-spin {

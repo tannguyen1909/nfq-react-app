@@ -112,7 +112,7 @@ export class Item extends Component {
                 </div>
                 <div className="Item-detail">
                     <h4 className="item-title">{data.title}</h4>
-                    <p>{data.description}</p>
+                    <p dangerouslySetInnerHTML={{__html: data.description}} />
                     <Media url={data.link} type={data.mediaType} canDownload={true}/>
                 </div>
             </div>

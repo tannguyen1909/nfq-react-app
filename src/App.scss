@@ -1,3 +1,5 @@
+@import "./sass/core/index";
+
 body {
     overflow-x: hidden;
     max-width: 100%;
@@ -5,4 +7,5 @@ body {
 
 main {
     background-color: #fcfbfa;
+    margin-top: $header-height;
 }

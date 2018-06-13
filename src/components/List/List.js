@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
 import './style.scss';
+import Pagination from "react-js-pagination";
 import {Loading} from '../Loading/Loading';
 import {Item} from '../Item/Item';
-import {CSV} from '../../utils';
+import {CONST, CSV} from '../../utils';
 import {fetchPosts, searchPostsFromNasa, selectPost, updateState} from "../../actions";
 
 export class List extends Component {
@@ -42,13 +43,22 @@ export class List extends Component {
         }
     }
 
+    handlePageChange(pageNumber) {
+        this.props.dispatch(updateState({
+            activePage: pageNumber
+        }))
+    }
+
+
     render() {
-        const {data, mode, isSearching} = this.props;
+        const {data, mode, isSearching, activePage} = this.props;
+        const index = (activePage - 1) * CONST.ITEMS_PER_PAGE;
+        const list = data.slice(index, index + CONST.ITEMS_PER_PAGE) || [];
 
         return (
             <div className="List d-flex">
                 <div className="col-l">
-                    <div className="list-controls mb-3">
+                    <div className="list-controls mb-4">
                         {
                             isSearching &&
                                 <button className="btn btn-primary"
@@ -77,7 +87,7 @@ export class List extends Component {
                     </div>
                     <ul className="list-group list-group-flush mb-4">
                         {
-                            data.map((post) =>
+                            list.map((post) =>
                                 <li className={`list-group-item ${this.props.currentId === post.id ? 'active' : ''}`}
                                     key={post.id}
                                     onClick={this.viewDetail.bind(this, post)}>
@@ -90,6 +100,13 @@ export class List extends Component {
                             )
                         }
                     </ul>
+                    <Pagination
+                        activePage={this.props.activePage}
+                        itemsCountPerPage={CONST.ITEMS_PER_PAGE}
+                        totalItemsCount={data.length}
+                        pageRangeDisplayed={CONST.PAGE_RANGE}
+                        onChange={this.handlePageChange.bind(this)}
+                    />
                 </div>
                 <div className="col-r d-flex">
                     <Item {...this.props}

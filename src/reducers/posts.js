@@ -5,7 +5,7 @@ const posts = (state = {
     isFetching: false,
     data: [],
     currentId: null,
-    currentPage: 1,
+    activePage: 1,
     currentPost: {},
     mode: 'view',
     opening: false,
@@ -27,7 +27,8 @@ const posts = (state = {
                 ...state,
                 isFetching: false,
                 isSearching: action.isSearching,
-                data: action.data || []
+                data: action.data || [],
+                activePage: 1
             };
         case SELECT_POST:
             return {
