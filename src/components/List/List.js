@@ -15,7 +15,7 @@ export class List extends Component {
     }
 
     exportToCSV() {
-        CSV.export(this.props.posts, 'NFQ-ReactApp');
+        CSV.export(this.props.data, 'NFQ-ReactApp');
     }
 
     create() {
