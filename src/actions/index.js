@@ -12,9 +12,10 @@ export const requestPosts = () => ({
     type: REQUEST_POSTS
 });
 
-export const receivePosts = (posts) => ({
+export const receivePosts = (posts, isNasa) => ({
     type: RECEIVE_POSTS,
-    data: posts
+    data: posts,
+    isSearching: !!isNasa
 });
 
 export const selectPost = (post) => ({
@@ -71,7 +72,7 @@ export const searchPostsFromNasa = (text) => (dispatch) => {
             }
 
             return Promise.all(promises)
-                .then(() => dispatch(receivePosts(data)))
+                .then(() => dispatch(receivePosts(data, true)))
                 .catch(() => dispatch(receivePosts(data)));
         });
 };
@@ -103,25 +104,34 @@ const uploadFile = (file) => {
 export const createPost = (data, file) => (dispatch) => {
     dispatch(requestPosts());
 
-    return uploadFile(file)
-        .then((media) => {
-            let post = {...data, ...media};
-            return $db.add(post).then(docRef => {
-                docRef && dispatch(updateState({
-                    mode: 'view',
-                    currentPost: {
-                        ...post,
-                        ...{id: docRef.id},
-                    }
-                }));
-                dispatch(fetchPosts);
-            });
-
-        })
-        .catch(() => {
-            alert("Can not create this item. Please try again!");
-            return dispatch(requestFinished());
+    const add = (post) => {
+        return $db.add(post).then(docRef => {
+            docRef && dispatch(updateState({
+                mode: 'view',
+                currentId: docRef.id,
+                currentPost: {
+                    ...post,
+                    ...{id: docRef.id},
+                }
+            }));
+            dispatch(fetchPosts);
         });
+    };
+
+    if (file) {
+        return uploadFile(file)
+            .then((media) => {
+                return add({...data, ...media});
+            })
+            .catch(() => {
+                alert("Can not create this item. Please try again!");
+                return dispatch(requestFinished());
+            });
+    } else if (!file && data.link) {
+        return add(data);
+    } else {
+        alert("Please select a file to upload!");
+    }
 };
 
 export const savePost = (data, file) => (dispatch) => {

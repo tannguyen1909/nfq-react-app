@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import './style.scss';
 import {Media} from '../Media/Media';
 import {updateState, createPost, deletePost, resetDetail, savePost} from "../../actions";
+import {$copy} from "../../utils";
 
 export class Item extends Component {
 
@@ -15,6 +16,12 @@ export class Item extends Component {
 
     create() {
         this.props.dispatch(createPost(this.state.data, this.state.file))
+    }
+
+    clone() {
+        const data = $copy(this.props.currentPost);
+        delete data.id;
+        this.props.dispatch(createPost(data));
     }
 
     add() {
@@ -33,7 +40,7 @@ export class Item extends Component {
         this.props.dispatch(updateState({mode: 'edit'}));
 
         this.setState({
-            data: JSON.parse(JSON.stringify(currentPost)),
+            data: $copy(currentPost),
             file: {
                 type: currentPost.mediaType,
                 url: currentPost.link
@@ -73,30 +80,40 @@ export class Item extends Component {
 
         if (file) {
             this.setState({file: file});
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                this.setState({
-                    file: Object.assign(this.state.file, {url: e.target.result})
-                })
-            };
-            reader.readAsDataURL(file);
+
+            if (file.type.startsWith('image')) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.setState({
+                        file: Object.assign(this.state.file, {url: e.target.result})
+                    })
+                };
+                reader.readAsDataURL(file);
+            }
         }
     }
 
     getViewTemplate() {
-        const {currentPost: data} = this.props;
+        const {currentPost: data, isSearching} = this.props;
 
         return (
             <div className="Item-content">
                 <div className="Item-header d-flex align-items-center">
                     <button className="btn btn-default mr-auto" onClick={this.close.bind(this)}>Close</button>
-                    <button className="btn btn-primary mr-3 ml-3" onClick={this.edit.bind(this)}>Edit</button>
-                    <button className="btn btn-danger" onClick={this.delete.bind(this)}>Delete</button>
+                    {
+                        !isSearching
+                            ?   [
+                                    <button key={'btn-edit'} className="btn btn-primary mr-3 ml-3" onClick={this.edit.bind(this)}>Edit</button>,
+                                    <button key={'btn-del'} className="btn btn-danger" onClick={this.delete.bind(this)}>Delete</button>
+                                ]
+                            : <button className="btn btn-primary mr-3 ml-3" onClick={this.clone.bind(this)}>Clone</button>
+                    }
+
                 </div>
                 <div className="Item-detail">
                     <h4 className="item-title">{data.title}</h4>
                     <p>{data.description}</p>
-                    <Media url={data.link} type={data.mediaType} />
+                    <Media url={data.link} type={data.mediaType} canDownload={true}/>
                 </div>
             </div>
         );

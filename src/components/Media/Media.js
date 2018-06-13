@@ -40,9 +40,9 @@ export class Media extends Component {
                 <div className="preview">
                     {type && url && this.getMediaControl()}
                 </div>
-                <div className="actions mt-3">
+                {this.props.canDownload && <div className="actions mt-3">
                     {url && <a href={url} download className="btn btn-primary" target="_blank">Download</a>}
-                </div>
+                </div>}
             </div>
         );
     }

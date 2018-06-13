@@ -8,7 +8,8 @@ const posts = (state = {
     currentPage: 1,
     currentPost: {},
     mode: 'view',
-    opening: false
+    opening: false,
+    isSearching: false
 }, action) => {
     switch (action.type) {
         case REQUEST_POSTS:
@@ -25,6 +26,7 @@ const posts = (state = {
             return {
                 ...state,
                 isFetching: false,
+                isSearching: action.isSearching,
                 data: action.data || []
             };
         case SELECT_POST:

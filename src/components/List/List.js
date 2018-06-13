@@ -10,6 +10,7 @@ export class List extends Component {
     constructor() {
         super();
         this.myRef = undefined;
+        this.inputSearch = React.createRef();
     }
 
     exportToCSV() {
@@ -26,8 +27,9 @@ export class List extends Component {
         }));
     }
 
-    onChange() {
-        // this.props.dispatch(fetchPosts);
+    backToHome() {
+        this.inputSearch.current.value = '';
+        this.props.dispatch(fetchPosts);
     }
 
     viewDetail(post) {
@@ -41,16 +43,26 @@ export class List extends Component {
     }
 
     render() {
-        const {data} = this.props;
+        const {data, mode, isSearching} = this.props;
 
         return (
             <div className="List d-flex">
                 <div className="col-l">
                     <div className="list-controls mb-3">
-                        <button className="btn btn-outline-primary mr-3"
+                        {
+                            isSearching &&
+                                <button className="btn btn-primary"
+                                        onClick={this.backToHome.bind(this)}>
+                                    Home
+                                </button>
+                        }
+                        <button className="btn btn-outline-primary ml-auto"
+                            disabled={mode === 'create'}
                             onClick={this.create.bind(this)}>Create
                         </button>
-                        <button className="btn btn-outline-secondary"onClick={this.exportToCSV.bind(this)}>Export CSV</button>
+                        <button className="btn btn-outline-secondary ml-3"
+                            disabled={!data.length}
+                            onClick={this.exportToCSV.bind(this)}>Export CSV</button>
                     </div>
                     <div className="mb-5">
                         <div className="input-group">
@@ -58,13 +70,14 @@ export class List extends Component {
                                 <span className="input-group-text">NASA</span>
                             </div>
                             <input type="text"
+                                   ref={this.inputSearch}
                                    onKeyPress={this.onSearch.bind(this)}
                                    className="form-control" placeholder="Search..."/>
                         </div>
                     </div>
                     <ul className="list-group list-group-flush mb-4">
                         {
-                            data.map(post =>
+                            data.map((post) =>
                                 <li className={`list-group-item ${this.props.currentId === post.id ? 'active' : ''}`}
                                     key={post.id}
                                     onClick={this.viewDetail.bind(this, post)}>
@@ -80,8 +93,7 @@ export class List extends Component {
                 </div>
                 <div className="col-r d-flex">
                     <Item {...this.props}
-                        ref={instance => this.myRef = instance}
-                        onChange={this.onChange.bind(this)}/>
+                        ref={instance => this.myRef = instance} />
                 </div>
                 {this.props.isFetching ? <Loading /> : ''}
             </div>
