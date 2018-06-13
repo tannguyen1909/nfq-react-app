@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import './App.scss';
 import {connect} from 'react-redux';
-import {Header, List} from './components';
+import {Header, List, Loading} from './components';
 import {fetchPosts} from './actions';
 
 class App extends Component {
@@ -16,9 +16,10 @@ class App extends Component {
                 <Header/>
                 <main>
                     <List {...this.props}/>
+                    {this.props.isFetching && <Loading />}
                 </main>
             </div>
-        );
+        )
     }
 }
 

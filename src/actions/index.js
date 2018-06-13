@@ -50,21 +50,30 @@ export const fetchPosts = (dispatch) => {
 
 export const searchPostsFromNasa = (text) => (dispatch) => {
     let data = [], promises = [];
-    dispatch(requestPosts());
+    dispatch(updateState({
+        isSearching: true,
+        isFetching: true
+    }));
 
     return fetch(`https://images-api.nasa.gov/search?q=${text}`)
         .then(response => response.json())
         .then(({collection: {items}}) => {
             if (items) {
-                items.forEach(({data: [post], href}, index) => {
+                let mediaUrl = '';
+
+                items.forEach(({data: [post], href, links}, index) => {
+                    mediaUrl = links && links[0] ? links[0].href : '';
+
                     data.push({
                         id: post.nasa_id,
                         title: post.title,
                         description: post.description,
                         mediaType: post.media_type,
+                        link: mediaUrl,
                         dateCreated: new Date(post.date_created).getTime()
                     });
-                    promises.push(
+
+                    !mediaUrl && promises.push(
                         fetch(href).then(res => res.json())
                             .then(links => data[index].link = links[0])
                     );
@@ -73,7 +82,7 @@ export const searchPostsFromNasa = (text) => (dispatch) => {
 
             return Promise.all(promises)
                 .then(() => dispatch(receivePosts(data, true)))
-                .catch(() => dispatch(receivePosts(data)));
+                .catch(() => dispatch(receivePosts(data, true)));
         });
 };
 

@@ -1,6 +1,23 @@
 .Media {
 
-  .img-fluid, .media-player {
+  .media-player {
     width: 100%;
+    display: block;
+
+    img {
+      height: auto;
+    }
+  }
+
+  .loading {
+    .media-player {
+      opacity: 0;
+    }
+  }
+
+  .spinner-wrapper {
+    position: relative;
+    height: 100px;
+    margin-top: 1rem;
   }
 }

@@ -6,16 +6,16 @@
 	width: 100%;
 	bottom: 0;
 	z-index: 1000;
+}
 
-	.cssload-loader {
-		position: absolute;
-		left: calc(50% - 31px);
-		top: calc(50% - 31px);
-		width: 62px;
-		height: 62px;
-		border-radius: 50%;
-		perspective: 780px;
-	}
+.cssload-loader {
+	position: absolute;
+	left: calc(50% - 31px);
+	top: calc(50% - 31px);
+	width: 62px;
+	height: 62px;
+	border-radius: 50%;
+	perspective: 780px;
 
 	.cssload-inner {
 		position: absolute;
